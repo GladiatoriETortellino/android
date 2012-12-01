@@ -25,6 +25,11 @@
         <link rel="stylesheet" type="text/css" href="lib/jquery-mobile/jquery.mobile-1.2.0.css" />
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         <title>Hello World</title>
+        <script>
+            var callingNumber = "";
+            var myFriends = [];
+        </script>
+
     </head>
     <body>
 
@@ -36,22 +41,23 @@
 
         <div data-role="content">
             <p>Hello world</p>
-            <a href="tel:3394745492">Chiama Daria!</a>
+            <a href="tel:+393394745492">Chiama Daria!</a>
             <p><a href="#viewpath" data-role="button">Show page "two"</a></p>
+            <p><a href="#" data-role="button" id="testContacts">TestConctacts</a></p>
+            <p><a href="#" data-role="button" id="loadDrivers">loadDrivers</a></p>
+            <p><a href="#" data-role="button" id="listFriendsBtn">get My Friends</a></p>
         </div>
 
     </div>
 
 
-    <div data-role="page" id="viewpath">
+    <div data-role="page" id="driversListPage">
         <div data-role="header">
             <h1>PoolMeUp!</h1>
         </div>
 
         <div data-role="content">
-            <p>Yuppieeee</p>
-
-            <ul data-role="listview" data-inset="true" data-filter="true">
+            <ul id="driversListUl" data-inset="true" data-filter="true">
                 <li><a href="#">Acura</a></li>
                 <li><a href="#">Audi</a></li>
                 <li><a href="#">BMW</a></li>
@@ -76,7 +82,11 @@
         <script type="text/javascript" src="lib/jquery-mobile/jquery.mobile-1.2.0.min.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript">
-            app.initialize();
+
+            $(document).ready(function () {
+                app.initialize();
+            });
+
 
 
         </script>
