@@ -327,12 +327,15 @@ var app = {
             }
             if (self.getCoords("#find-origine", req) === false) return;
             if (self.getCoords("#find-destinazione", req) === false) return;
-            console.log(req);
+            console.info("##########");
+            console.log(JSON.stringify(req));
+            console.info("##########");
 
             currentFindRequest = JSON.stringify(req);
 
             var url = "http://poolmeup.appspot.com/rest/rides";
             $.post(url, JSON.stringify(req), function(data) {
+                console.info("RIDES???")
                 if(data && data.offers > 0){
                     self.showDriverList(data.offers);
                 }
