@@ -18,7 +18,6 @@
  */
 var app = {
 
-    myFriends: [],
     savedCO2: 0,
 
     // Application Constructor
@@ -50,7 +49,7 @@ var app = {
         document.addEventListener('resume', function() {
 
             if(callingNumber && callingNumber.length > 0) {
-                navigator.notification.confirm('Was a real friend or not?', function(found) {
+                navigator.notification.confirm('Was he/she a true friend?', function(found) {
                     if(found == 1){
                         $.ajax({
                             url: 'http://poolmeup.appspot.com/rest/offers/'+callingNumber+'/join',
@@ -67,7 +66,7 @@ var app = {
                         });
 
                     }
-                }, 'Did you find a ride?', 'Yes, No')
+                }, 'Did he/she accept?', 'Yes, No')
             }
 
         }, false);
@@ -124,7 +123,7 @@ var app = {
             $.mobile.changePage("#popupMyPhone");
             $('#setMyIp').click(function(){
                 myPhoneNumber = $('#myphoneinput').val();
-                //window.localStorage.setItem("poolmeupmyphone", myPhoneNumber);
+                window.localStorage.setItem("poolmeupmyphone", myPhoneNumber);
                 $.mobile.changePage("#index");
             })
         }
@@ -211,10 +210,10 @@ var app = {
 //                        console.info("Aggiungo " + name + " con foto " + img);
                         var li = '<li phone="'+driver.phoneNumber+'" id="phone_'+name+'">' +
                             '<a href="#">' +
-                            '<img src="'+ img +'" />' +
+                            '<img src="'+ img +'" onerror="this.src=\'img/noUserImg.png\'"/>' +
                             '<h3>'+ name +'</h3>' +
-                            '<p class="phone">tel. '+driver.phoneNumber + '</p>' +
-                            '<p class="veichle">Veicolo '+driver.vehicleType+'</p>' +
+//                            '<p class="phone">tel. '+driver.phoneNumber + '</p>' +
+                            '<p class="veichle">'+driver.vehicleType+'</p>' +
                             '</a>' +
                             '</li>';
                         ul.append(li);
@@ -239,11 +238,6 @@ var app = {
 
 
         });
-
-    },
-
-    getMyFriends: function() {
-
 
     },
 
@@ -307,11 +301,6 @@ var app = {
                 vehicleType:"car",
                 waitingTime:"35"
             },{
-                name: 'Minni',
-                phoneNumber:"+393397323027",
-                vehicleType:"motorino",
-                waitingTime:"75"
-            },{
                 name:"Mariella",
                 phoneNumber:"+393337701783",
                 vehicleType:"autobus",
@@ -344,6 +333,12 @@ var app = {
             if (self.getCoords("#find-destinazione", req) === false) return;
             console.log(req);
         });
+
+        var d = new Date();
+        var now = d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + ' ' + d.getHours() + ':' + d.getMinutes();
+
+        $('#offer-data').val(now);
+        $('#find-data').val(now);
     },
 
     getCoords: function(id, req) {

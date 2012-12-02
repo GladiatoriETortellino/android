@@ -39,6 +39,12 @@
             };
         </script>
 
+        <style type="text/css">
+
+            .ui-btn-text { white-space:none !important; }
+
+        </style>
+
     </head>
     <body>
 
@@ -48,6 +54,8 @@
             <h1>PoolMeUp!</h1>
         </div>
 
+        <img src="lapappa.png" onerror="this.src='img/noUserImg.png'" />
+
         <div data-role="content">
             <p><a href="#find" data-role="button">Find a ride!</a></p>
             <p><a href="#offer" data-role="button">Offer a ride!</a></p>
@@ -55,7 +63,7 @@
 
     </div>
 
-    <div data-role="page" id="rideFound" style="background-image: url(img/bg_ok.png);">
+    <div data-role="page" id="rideFound" style="background-image: url(img/bg.png);">
 
         <div data-role="header">
             <h1>PoolMeUp!</h1>
@@ -63,9 +71,12 @@
 
         <div data-role="content">
             <h1>Congratulations!</h1>
-            <br /><br /><br /><br /><br /><br />
+            <img src="img/hand.png" />
             <h2>You found a ride!</h2>
-            <p>With this ride, you earned <span id="earnedPoints" style="font-size: 10pt;"></span> points!</p>
+            <p>
+                With this ride, you saved <span id="earnedPoints" style="font-size: 10pt;"></span> kg of CO2,
+                that will be converted in PoolPoints!
+            </p>
         </div>
 
     </div>
@@ -78,7 +89,7 @@
         </div>
 
         <div data-role="content">
-            <h2>These friends are elegible for give you a ride.<br />>Choose your ride:</h2>
+            <h2>These friends are eligible to give you a ride.<br />Choose your ride:</h2>
             <ul id="driversListUl" data-inset="true" data-filter="true">
 
             </ul>
@@ -106,9 +117,9 @@
             <label for="find-origine">Origin:</label>
             <input type="text" name="origine" id="find-origine">
             <label for="find-destinazione">Destination:</label>
-            <input type="text" name="destinazione" id="find-destinazione">
-            <label for="data">Date:</label>
-            <input type="text" name="data" id="data">
+            <input type="text" name="destinazione" id="find-destinazione" >
+            <label for="find-data">Date:</label>
+            <input type="text" name="data" id="find-data">
             <label for="find-persons">We are in:</label>
             <input type="range" name="persons" id="find-persons" value="1" min="1" max="10" />
             <button id="findride">Find a ride!</button>
@@ -129,7 +140,7 @@
             <label for="offer-persons">Available seats:</label>
             <input type="range" name="persons" id="offer-persons" value="1" min="1" max="10" />
             <label for="maxtreshold">Max. delay (minutes):</label>
-            <input type="range" name="maxtreshold" id="maxtreshold" value="30" min="0" max="500" />
+            <input type="range" name="maxtreshold" id="maxtreshold" value="30" min="1" max="60" />
             <fieldset id="veicolo" data-role="controlgroup" data-type="horizontal">
                 <legend>Vehicle:</legend>
                 <input type="radio" name="veicolo" id="auto" value="auto" checked="checked">
@@ -175,7 +186,7 @@
 
                 $("#offer-origine").val("Via della vasca navale");
                 $("#offer-destinazione").val("viale marconi");
-                $("#offer-data").val("23/10/1991 23:23");
+
             });
 
 
