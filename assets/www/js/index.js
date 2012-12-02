@@ -27,8 +27,9 @@ var app = {
         $(document).ajaxError(function(event, request, settings, exception) {
             console.warn("ERRORE AJAX");
             console.warn(settings.url);
-            self.showDialog("Network error", "Error connecting to "+settings.url);
+            self.showDialog("Network error", "Error connecting to "+settings.url+". <p>"+exception+"</p>");
         });
+        $.ajaxSetup({ contentType: "application/json" });
 
         this.initUi();
     },
@@ -118,7 +119,7 @@ var app = {
 
             // Check for user phone number
         var myPhoneNumber =  window.localStorage.getItem("poolmeupmyphone");
-        myPhoneNumber = "";
+        // myPhoneNumber = "";
         if(!myPhoneNumber || myPhoneNumber.length == 0) {
             $.mobile.changePage("#popupMyPhone");
             $('#setMyIp').click(function(){
@@ -258,7 +259,7 @@ var app = {
                 maxTreshold: parseInt($("#maxtreshold").val()),
                 numberPlaces: parseInt($("#offer-persons").val()),
                 pathRequest: [],
-                phoneNumber: self.getMyPhone(),
+                phoneNumber: self.getMyPhone() || 3333333333,
                 userName: "Pippo",
                 vehicleType: $("#veicolo input:checked").val()
             };
@@ -281,8 +282,8 @@ var app = {
 
             var url = "http://poolmeup.appspot.com/rest/offers";
             var idOffer = null;
-            $.post(url, req, function(data) {
-                idOffer = data.idOffer;
+            $.post(url, JSON.stringify(req), function(data) {
+                idOffer = data.idOffer || 1;
                 var s = self.parseXML(data.pathResponse);
                 $.mobile.changePage("#viewpath");
                 $("#actionlist").append(s).listview("refresh");
@@ -312,9 +313,7 @@ var app = {
                 waitingTime:"155"
             }];
 
-            self.showDriverList(drivers);
             savedCO2 = 500;
-            return;
 
             var req = {
                     friends: self.getMyFriends(),
@@ -332,6 +331,12 @@ var app = {
             if (self.getCoords("#find-origine", req) === false) return;
             if (self.getCoords("#find-destinazione", req) === false) return;
             console.log(req);
+
+            var url = "http://poolmeup.appspot.com/rest/rides";
+            $.post(url, JSON.stringify(req), function(data) {
+                self.showDriverList(data.offers);
+            });
+
         });
 
         var d = new Date();
@@ -345,7 +350,7 @@ var app = {
         var obj = {};
         // var url = "addr.json";
         var url = "http://maps.googleapis.com/maps/api/geocode/json";
-        $.get(url, {sensor: false, address: $(id).val()}, function (data) {
+        $.ajax({url: url, data: {sensor: false, address: $(id).val()}, success: function (data) {
             var status = data.status;
             if (status == "ZERO_RESULTS") {
                 self.showDialog("Zero Risultati", "L'indirizzo insierito è sconosciuto. Riprovare.");
@@ -357,7 +362,7 @@ var app = {
             obj.lat = data.geometry.location.lat;
             obj.long = data.geometry.location.lng;
             req.pathRequest.push(obj);
-        }, "json");
+        }, dataType: "json", async: false});
         return obj;
     },
 
@@ -415,7 +420,13 @@ var app = {
     },
 
     getMyPhone: function() {
-        return window.localStorage.getItem("poolmeupmyphone");
+        var myNum = window.localStorage.getItem("poolmeupmyphone");
+        if(myNum && myNum.length > 0 ){
+            return myNum;
+        }
+        else {
+            return "3397323027";
+        }
     }
 
 };
