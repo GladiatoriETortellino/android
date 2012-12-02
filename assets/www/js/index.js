@@ -103,7 +103,39 @@ var app = {
                 $.mobile.loading( 'hide' );
                 console.log(error);
                 console.log(error.message);
-            }, options);
+            }, options
+        );
+
+
+
+            // Check for user phone number
+        var myPhoneNumber =  window.localStorage.getItem("poolmeupmyphone");
+        console.info("########");
+        console.info(myPhoneNumber);
+        console.info("########");
+
+        if(!myPhoneNumber || myPhoneNumber.length == 0) {
+            $( "#popupMyPhone" ).popup();
+            $( "#popupMyPhone" ).popup('open');
+            $('#setMyIp').click(function(){
+                myPhoneNumber = $('#myphoneinput').val();
+                window.localStorage.setItem("poolmeupmyphone", myPhoneNumber);
+            })
+            //myphoneinput
+        }
+
+        console.info("########");
+
+
+
+//            console.log("in getMyPhoneNumber");
+//            var onSuccess = function(result) {
+//                console.log("My phone number: " + result.phoneNumber);
+//            }
+//            var onError = function(err) {
+//                console.log("Could not get my phone number: " + err);
+//            }
+//            MyPhoneNumberPlugin.getMyPhoneNumber(onSuccess, onError);
     },
 
 

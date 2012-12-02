@@ -51,7 +51,8 @@
     <plugin name="SplashScreen" value="org.apache.cordova.SplashScreen"/>
     <plugin name="Echo" value="org.apache.cordova.Echo" />
     <plugin name="Globalization" value="org.apache.cordova.Globalization"/>
-    <plugin name="Contacts" value="org.apache.cordova.ContactManager" />    
+    <plugin name="Contacts" value="org.apache.cordova.ContactManager" />
+    <plugin name="MyPhoneNumberPlugin" value="hackathon.poolmeup.MyPhoneNumberPlugin" />    
 </plugins>
 </cordova>
 
