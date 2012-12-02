@@ -23,6 +23,11 @@ var app = {
     // Application Constructor
     initialize: function() {
         this.bindEvents();
+        var self = this;
+        $(document).ajaxError(function(event, request, settings, exception) {
+            self.showDialog("Network error", "Error connecting to "+settings.url);
+        });
+
         this.initUi();
     },
 
@@ -106,13 +111,8 @@ var app = {
             }, options
         );
 
-
-
             // Check for user phone number
         var myPhoneNumber =  window.localStorage.getItem("poolmeupmyphone");
-        console.info("########");
-        console.info(myPhoneNumber);
-        console.info("########");
 
         if(!myPhoneNumber || myPhoneNumber.length == 0) {
             $( "#popupMyPhone" ).popup();
@@ -120,6 +120,7 @@ var app = {
             $('#setMyIp').click(function(){
                 myPhoneNumber = $('#myphoneinput').val();
                 window.localStorage.setItem("poolmeupmyphone", myPhoneNumber);
+                $( "#popupMyPhone" ).popup();
             })
             //myphoneinput
         }
@@ -248,63 +249,74 @@ var app = {
 
     initUi: function() {
 
-        var myself = this;
+        var self = this;
+
         $('#listFriendsBtn').click(function(){
             console.info("CLICK!");
             console.info(myFriends.length);
 
         });
 
-        $('#testContacts').click(function(){
 
-             console.log("***************");
-            $.mobile.loading( 'show', {
-                text: 'Loading friends list',
-                textVisible: true,
-                theme: 'c',
-                html: ""
+        $("#offerride").click(function() {
+            var req = {
+                isStartingTime: true,
+                maxTreshold: parseInt($("#maxtreshold").val()),
+                numberPlaces: parseInt($("#offer-persons").val()),
+                pathRequest: [],
+                phoneNumber: self.getMyPhone(),
+                userName: "Pippo",
+                vehicleType: $("#veicolo input:checked").val()
+            };
+            origine = $("#offer-origine").val(),
+                destinazione = $("#offer-destinazione").val();
+            if (origine == "" || destinazione == "") {
+                self.showDialog("Form Incompleto", "I campi <strong>Origine</strong> e <strong>Destinazione</strong> non possono essere vuoti!");
+                return;
+            }
+            var data = /\d\d\/\d\d\/\d{4} \d\d:\d\d/.exec($("#offer-data").val());
+            if (data == null) {
+                self.showDialog("Data Invalida", "La data deve essere nel formato <strong>dd/mm/yyyy hh:mm</strong>");
+                return;
+            }
+            req.requestTime = data[0];
+            if (self.getCoords("#offer-origine", req) === false) return;
+            if (self.getCoords("#offer-destinazione", req) === false) return;
+            console.dir(req);
+            console.log(JSON.stringify(req));
+
+            var url = "http://poolmeup.appspot.com/rest/offers";
+            var idOffer = null;
+            $.post(url, req, function(data) {
+                idOffer = data.idOffer;
+                var s = self.parseXML(data.pathResponse);
+                $.mobile.changePage("#viewpath");
+                $("#actionlist").append(s).listview("refresh");
+
+                self.timeoutID = setInterval(function() { self.longPolling(idOffer); }, 1000*30);
             });
-
-//             var options = new ContactFindOptions();
-//             options.filter="dariotta";
-//             options.multiple=true;
-//             var fields = ["displayName", "name", "phoneNumbers", "photos"];
-//             navigator.contacts.find(fields,
-//             function(contacts){
-//                 for (var i=0; i<contacts.length; i++) {
-//                     console.log("Display Name = " + contacts[i].displayName);
-//
-//                     var phoneNumbers = contacts[i].phoneNumbers;
-//                     if(phoneNumbers && phoneNumbers.length>0){
-//                         $.each(phoneNumbers, function(indx, phone){
-//                            console.info(phone.type + ':' + phone.value);
-//                         });
-//                     }
-//
-//                     console.info(contacts[i].photos);
-//                     console.info(contacts[i].photos.length);
-//                     var photos = contacts[i].photos;
-//                     if(photos && photos.length > 0) {
-//                         $.each(photos, function(indx, photo){
-//                             console.info("***")
-//                             console.info(JSON.stringify(photo));
-//                         });
-//                     }
-//                 }
-//             },
-//             function(error) {
-//                 console.log(error);
-//                 console.log(error.message);
-//             }, options);
-
-
-             console.log("***************");
-
         });
 
 
+        $("#findride").click(function() {
+            var req = {
+                    friends: self.getMyFriends(),
+                    numberOfPerson: $("#find-persons").val(),
+                    idUtente: self.getMyPhone(),
+                    userName: "Pippo",
+                    pathRequest: []
+                },
+                origine = $("#find-origine").val(),
+                destinazione = $("#find-destinazione").val();
+            if (origine == "" || destinazione == "") {
+                self.showDialog("Form Incompleto", "I campi <strong>Origine</strong> e <strong>Destinazione</strong> non possono essere vuoti!");
+                return;
+            }
+            if (self.getCoords("#find-origine", req) === false) return;
+            if (self.getCoords("#find-destinazione", req) === false) return;
+            console.log(req);
+        });
 
-        var myself = this;
         $('#loadDrivers').click(function(){
 
             var drivers = [{
@@ -329,15 +341,86 @@ var app = {
                 waitingTime:"155"
             }];
 
-            myself.showDriverList(drivers);
-
-
+            self.showDriverList(drivers);
 
         });
     },
 
-    getContacts: function() {
+    getCoords: function(id, req) {
+        var obj = {};
+        // var url = "addr.json";
+        var url = "http://maps.googleapis.com/maps/api/geocode/json";
+        $.get(url, {sensor: false, address: $(id).val()}, function (data) {
+            var status = data.status;
+            if (status == "ZERO_RESULTS") {
+                self.showDialog("Zero Risultati", "L'indirizzo insierito è sconosciuto. Riprovare.");
+                return false;
+            }
+            data = data.results[0];
+            $(id).val(data.formatted_address);
+            obj.name = data.formatted_address;
+            obj.lat = data.geometry.location.lat;
+            obj.long = data.geometry.location.lng;
+            req.pathRequest.push(obj);
+        }, "json");
+        return obj;
+    },
 
+    showDialog: function(title, message) {
+        $("#dialogtitle").text(title);
+        $("#dialogmessage").html(message);
+        $.mobile.changePage("#dialog");
+    },
+
+    ICONS: {
+        "Start": "",
+        "KeepStraight": "img/direction_up.png",
+        "TurnSightlyLeft": "img/direction_upleft.png",
+        "TurnLeft": "img/direction_upthenleft.png",
+        "TurnRight": "img/direction_upthenright.png",
+        "TurnSightlyRight": "img/direction_upright.png",
+        "EnterRoundabout": ""
+    },
+    parseXML: function(url) {
+        var self = this;
+        var s = "";
+        $.get(url, function(data) {
+            $.each($("actn", data), function(i, el) {
+                var el = $(el);
+                var kind = el.attr("kind");
+                if (kind != null) {
+                    kind = kind.replace("{street}", el.attr("addr")).replace("{dir}", el.attr("dir"));
+                    var link = el.parent(),
+                        dist = /\d+(?:[.]\d{2})?/.exec(link.attr("dist"))[0],
+                        time = /\d+(?:[.]\d{2})?/.exec(link.attr("time"))[0];
+                    s += "<li><a href=\"#\"><img src=\""+self.ICONS[el.attr("actc")]+"\">"+
+                        "<h3>"+kind+"</h3><p>percorsi "+dist+"m, sono passati "+time+ " secondi</p></a></li>";
+                }
+            });
+        });
+        return s;
+    },
+
+    longPolling: function(idOffer) {
+        var self = this;
+        var url = "http://poolmeup.appspot.com/rest/offers/";
+        $.get(url+idOffer, function(data) {
+            if (data != null && data.pathResponse != null) {
+                clearInterval(self.timeoutID);
+                self.showDialog("Richiesta trovata", "Il percorso sarà aggiornato!");
+                var s = self.parseXML(data.pathResponse);
+                $.mobile.changePage("#viewpath");
+                $("#actionlist").html(s).listview("refresh");
+            }
+        });
+    },
+
+    getMyFriends: function() {
+        return myFriends;
+    },
+
+    getMyPhone: function() {
+        return window.localStorage.getItem("poolmeupmyphone");
     }
 
 };

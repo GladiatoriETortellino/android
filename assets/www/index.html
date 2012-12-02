@@ -24,7 +24,7 @@
         <meta name="viewport" content="initial-scale=1, width=device-width">
         <link rel="stylesheet" type="text/css" href="lib/jquery-mobile/jquery.mobile-1.2.0.css" />
         <link rel="stylesheet" type="text/css" href="css/index.css" />
-        <title>Hello World</title>
+        <title>PoolMeUp</title>
         <script>
             var callingNumber = "";
             var myFriends = [];
@@ -44,21 +44,18 @@
     <div data-role="page" id="index" style="background: #000000 url('img/risunki-yumor-7195.jpg') repeat;">
 
         <div data-role="header">
-            <h1>My Title</h1>
+            <h1>PoolMeUp!</h1>
         </div>
 
         <div data-role="content">
-            <p>Hello world</p>
-            <a href="tel:+393394745492">Chiama Daria!</a>
-            <p><a href="#viewpath" data-role="button">Show page "two"</a></p>
-            <p><a href="#" data-role="button" id="testContacts">TestConctacts</a></p>
-            <p><a href="#" data-role="button" id="loadDrivers">loadDrivers</a></p>
-            <p><a href="#" data-role="button" id="listFriendsBtn">get My Friends</a></p>
+            <p><a href="#find" data-role="button">Trova un passaggio</a></p>
+            <p><a href="#offer" data-role="button">Offri un passaggio</a></p>
         </div>
 
     </div>
 
 
+    <!-- Elenco di quelli che offrono un passaggio -->
     <div data-role="page" id="driversListPage">
         <div data-role="header">
             <h1>PoolMeUp!</h1>
@@ -66,11 +63,7 @@
 
         <div data-role="content">
             <ul id="driversListUl" data-inset="true" data-filter="true">
-                <li><a href="#">Acura</a></li>
-                <li><a href="#">Audi</a></li>
-                <li><a href="#">BMW</a></li>
-                <li><a href="#">Cadillac</a></li>
-                <li><a href="#">Ferrari</a></li>
+
             </ul>
         </div>
     </div>
@@ -86,15 +79,74 @@
         </form>
     </div>
 
-    <!--
-        <div class="app">
-            <h1>Apache Cordova</h1>
-            <div id="deviceready" class="blink">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
-            </div>
+
+    <div data-role="page" id="find">
+        <div data-role="header">
+            <h1>PoolMeUp! Trova passaggio</h1>
         </div>
-    -->
+
+        <div data-role="content">
+            <label for="find-origine">Origine:</label>
+            <input type="text" name="origine" id="find-origine">
+            <label for="find-destinazione">Destinazione:</label>
+            <input type="text" name="destinazione" id="find-destinazione">
+            <label for="data">Data:</label>
+            <input type="text" name="data" id="data">
+            <label for="find-persons">Siamo In:</label>
+            <input type="range" name="persons" id="find-persons" value="1" min="1" max="10" />
+            <button id="findride">Trova un passaggio!</button>
+        </div>
+    </div>
+    <div data-role="page" id="offer">
+        <div data-role="header">
+            <h1>PoolMeUp! Offri Passaggio</h1>
+        </div>
+
+        <div data-role="content">
+            <label for="offer-origine">Origine:</label>
+            <input type="text" name="origine" id="offer-origine">
+            <label for="offer-destinazione">Destinazione:</label>
+            <input type="text" name="destinazione" id="offer-destinazione">
+            <label for="offer-data">Data:</label>
+            <input type="text" name="data" id="offer-data" placeholder="dd/mm/yyyy hh:mm">
+            <label for="offer-persons">Posti disponibili:</label>
+            <input type="range" name="persons" id="offer-persons" value="1" min="1" max="10" />
+            <label for="maxtreshold">Ritardo ammissibile (minuti):</label>
+            <input type="range" name="maxtreshold" id="maxtreshold" value="30" min="0" max="500" />
+            <fieldset id="veicolo" data-role="controlgroup" data-type="horizontal">
+                <legend>Tipo di Veicolo:</legend>
+                <input type="radio" name="veicolo" id="auto" value="auto" checked="checked">
+                <label for="auto">Macchina</label>
+                <input type="radio" name="veicolo" id="scooter" value="scooter">
+                <label for="scooter">Moto</label>
+            </fieldset>
+            <button id="offerride">Conferma offerta!</button>
+        </div>
+    </div>
+
+    <div data-role="dialog" id="dialog">
+        <div data-role="header" data-theme="d">
+            <h1 id="dialogtitle">Titolo</h1>
+        </div>
+        <div data-role="content" data-theme="c">
+            <p id="dialogmessage">Contenuto</p>
+            <a href="#" data-role="button" data-rel="back" data-theme="b">Ok</a>
+        </div>
+    </div>
+
+    <div data-role="page" id="viewpath">
+        <div data-role="header">
+            <h1>PoolMeUp!</h1>
+        </div>
+
+        <div data-role="content">
+            <ul id="actionlist" data-role="listview" data-inset="true" data-filter="true">
+
+            </ul>
+        </div>
+
+    </div>
+
         <script type="text/javascript" src="cordova-2.2.0.js"></script>
         <script type="text/javascript" src="lib/jquery.min.js"></script>
         <script type="text/javascript" src="lib/jquery-mobile/jquery.mobile-1.2.0.min.js"></script>
@@ -103,6 +155,10 @@
 
             $(document).ready(function () {
                 app.initialize();
+
+                $("#offer-origine").val("Via della vasca navale");
+                $("#offer-destinazione").val("viale marconi");
+                $("#offer-data").val("23/10/1991 23:23");
             });
 
 
