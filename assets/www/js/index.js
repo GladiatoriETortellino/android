@@ -19,6 +19,7 @@
 var app = {
 
     myFriends: [],
+    savedCO2: 0,
 
     // Application Constructor
     initialize: function() {
@@ -55,7 +56,10 @@ var app = {
                             url: 'http://poolmeup.appspot.com/rest/offers/'+callingNumber+'/join',
                             type: 'POST',
                             success: function(data){
-                                navigator.notification.alert(data.response, function(){});
+                                navigator.notification.alert(data.response, function(){
+                                    $.mobile.changePage("#rideFound");
+                                    $('#earnedPoints').text(savedCO2);
+                                });
                             },
                             error: function(jqXHR, textStatus, errorThrown){
                                 navigator.notification.alert("Errore:" + textStatus, function(){});
@@ -90,7 +94,7 @@ var app = {
                     if(phoneNumbers && phoneNumbers.length>0){
                         $.each(phoneNumbers, function(indx, phone){
                             if(phone.type == 'mobile') {
-                                number = phone.value;
+                                number = phone.value.replace('+39');
                                 return false;
                             }
                         });
@@ -295,26 +299,8 @@ var app = {
 
 
         $("#findride").click(function() {
-            var req = {
-                    friends: self.getMyFriends(),
-                    numberOfPerson: $("#find-persons").val(),
-                    idUtente: self.getMyPhone(),
-                    userName: "Pippo",
-                    pathRequest: []
-                },
-                origine = $("#find-origine").val(),
-                destinazione = $("#find-destinazione").val();
-            if (origine == "" || destinazione == "") {
-                self.showDialog("Form Incompleto", "I campi <strong>Origine</strong> e <strong>Destinazione</strong> non possono essere vuoti!");
-                return;
-            }
-            if (self.getCoords("#find-origine", req) === false) return;
-            if (self.getCoords("#find-destinazione", req) === false) return;
-            console.log(req);
-        });
 
-        $('#loadDrivers').click(function(){
-
+            // FIXME DEBUG
             var drivers = [{
                 name: 'Minni',
                 phoneNumber:"3397323027",
@@ -338,7 +324,25 @@ var app = {
             }];
 
             self.showDriverList(drivers);
+            savedCO2 = 500;
+            return;
 
+            var req = {
+                    friends: self.getMyFriends(),
+                    numberOfPerson: $("#find-persons").val(),
+                    idUtente: self.getMyPhone(),
+                    userName: "Pippo",
+                    pathRequest: []
+                },
+                origine = $("#find-origine").val(),
+                destinazione = $("#find-destinazione").val();
+            if (origine == "" || destinazione == "") {
+                self.showDialog("Form Incompleto", "I campi <strong>Origine</strong> e <strong>Destinazione</strong> non possono essere vuoti!");
+                return;
+            }
+            if (self.getCoords("#find-origine", req) === false) return;
+            if (self.getCoords("#find-destinazione", req) === false) return;
+            console.log(req);
         });
     },
 

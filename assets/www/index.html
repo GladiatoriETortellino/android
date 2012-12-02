@@ -28,6 +28,7 @@
         <script>
             var callingNumber = "";
             var myFriends = [];
+            var savedCO2 = 0;
 
             //constructor
             var MyPhoneNumberPlugin = {
@@ -41,27 +42,43 @@
     </head>
     <body>
 
-    <div data-role="page" id="index" style="background: #414A59 url('img/risunki-yumor-7195.jpg') bottom left no-repeat fixed;">
+    <div data-role="page" id="index" style="background-image: url(img/bg.png);">
 
         <div data-role="header">
             <h1>PoolMeUp!</h1>
         </div>
 
         <div data-role="content">
-            <p><a href="#find" data-role="button">Trova un passaggio</a></p>
-            <p><a href="#offer" data-role="button">Offri un passaggio</a></p>
+            <p><a href="#find" data-role="button">Find a ride!</a></p>
+            <p><a href="#offer" data-role="button">Offer a ride!</a></p>
+        </div>
+
+    </div>
+
+    <div data-role="page" id="rideFound" style="background-image: url(img/bg_ok.png);">
+
+        <div data-role="header">
+            <h1>PoolMeUp!</h1>
+        </div>
+
+        <div data-role="content">
+            <h1>Congratulations!</h1>
+            <br /><br /><br /><br /><br /><br />
+            <h2>You found a ride!</h2>
+            <p>With this ride, you earned <span id="earnedPoints" style="font-size: 10pt;"></span> points!</p>
         </div>
 
     </div>
 
 
     <!-- Elenco di quelli che offrono un passaggio -->
-    <div data-role="page" id="driversListPage">
+    <div data-role="page" id="driversListPage" style="background-image: url(img/bg.png);">
         <div data-role="header">
             <h1>PoolMeUp!</h1>
         </div>
 
         <div data-role="content">
+            <h2>These friends are elegible for give you a ride.<br />>Choose your ride:</h2>
             <ul id="driversListUl" data-inset="true" data-filter="true">
 
             </ul>
@@ -75,69 +92,68 @@
         </div>
         <div data-role="content" data-theme="c">
             <p>Please insert your phone number (without +39)</p>
-            <input type="tel" name="user" id="myphoneinput" value="" placeholder="username" data-theme="a" />
+            <input type="tel" name="user" id="myphoneinput" value="" placeholder="phone" data-theme="a" />
             <button type="submit" data-theme="b" id="setMyIp">Sign in</button>
         </div>
     </div>
 
-
-    <div data-role="page" id="find">
+    <div data-role="page" id="find" style="background-image: url(img/bg.png);">
         <div data-role="header">
-            <h1>PoolMeUp! Trova passaggio</h1>
+            <h1>PoolMeUp! Find a ride</h1>
         </div>
 
         <div data-role="content">
-            <label for="find-origine">Origine:</label>
+            <label for="find-origine">Origin:</label>
             <input type="text" name="origine" id="find-origine">
-            <label for="find-destinazione">Destinazione:</label>
+            <label for="find-destinazione">Destination:</label>
             <input type="text" name="destinazione" id="find-destinazione">
-            <label for="data">Data:</label>
+            <label for="data">Date:</label>
             <input type="text" name="data" id="data">
-            <label for="find-persons">Siamo In:</label>
+            <label for="find-persons">We are in:</label>
             <input type="range" name="persons" id="find-persons" value="1" min="1" max="10" />
-            <button id="findride">Trova un passaggio!</button>
+            <button id="findride">Find a ride!</button>
         </div>
     </div>
-    <div data-role="page" id="offer">
+    <div data-role="page" id="offer" style="background-image: url(img/bg.png);">
         <div data-role="header">
-            <h1>PoolMeUp! Offri Passaggio</h1>
+            <h1>PoolMeUp! Offer a ride!</h1>
         </div>
 
         <div data-role="content">
-            <label for="offer-origine">Origine:</label>
+            <label for="offer-origine">Origin:</label>
             <input type="text" name="origine" id="offer-origine">
-            <label for="offer-destinazione">Destinazione:</label>
+            <label for="offer-destinazione">Destination:</label>
             <input type="text" name="destinazione" id="offer-destinazione">
-            <label for="offer-data">Data:</label>
+            <label for="offer-data">When:</label>
             <input type="text" name="data" id="offer-data" placeholder="dd/mm/yyyy hh:mm">
-            <label for="offer-persons">Posti disponibili:</label>
+            <label for="offer-persons">Available seats:</label>
             <input type="range" name="persons" id="offer-persons" value="1" min="1" max="10" />
-            <label for="maxtreshold">Ritardo ammissibile (minuti):</label>
+            <label for="maxtreshold">Max. delay (minutes):</label>
             <input type="range" name="maxtreshold" id="maxtreshold" value="30" min="0" max="500" />
             <fieldset id="veicolo" data-role="controlgroup" data-type="horizontal">
-                <legend>Tipo di Veicolo:</legend>
+                <legend>Vehicle:</legend>
                 <input type="radio" name="veicolo" id="auto" value="auto" checked="checked">
-                <label for="auto">Macchina</label>
+                <label for="auto">Car</label>
                 <input type="radio" name="veicolo" id="scooter" value="scooter">
-                <label for="scooter">Moto</label>
+                <label for="scooter">Scooter</label>
             </fieldset>
-            <button id="offerride">Conferma offerta!</button>
+            <button id="offerride">Get your path and wait for a friend!</button>
         </div>
     </div>
 
     <div data-role="dialog" id="dialog">
         <div data-role="header" data-theme="d">
-            <h1 id="dialogtitle">Titolo</h1>
+            <h1 id="dialogtitle">Title</h1>
         </div>
         <div data-role="content" data-theme="c">
-            <p id="dialogmessage">Contenuto</p>
+            <p id="dialogmessage">Message</p>
             <a href="#" data-role="button" data-rel="back" data-theme="b">Ok</a>
         </div>
     </div>
 
-    <div data-role="page" id="viewpath">
+    <div data-role="page" id="viewpath" style="background-image: url(img/bg.png);">
         <div data-role="header">
-            <h1>PoolMeUp!</h1>
+            <h1>PoolMeUp! MyTrip</h1>
         </div>
 
         <div data-role="content">
