@@ -55,6 +55,7 @@ var app = {
                         $.ajax({
                             url: 'http://poolmeup.appspot.com/rest/offers/'+callingNumber+'/join',
                             type: 'POST',
+                            data: currentFindRequest,
                             success: function(data){
                                 navigator.notification.alert(data.response, function(){
                                     $.mobile.changePage("#rideFound");
@@ -119,7 +120,7 @@ var app = {
 
             // Check for user phone number
         var myPhoneNumber =  window.localStorage.getItem("poolmeupmyphone");
-        // myPhoneNumber = "";
+        myPhoneNumber = "";
         if(!myPhoneNumber || myPhoneNumber.length == 0) {
             $.mobile.changePage("#popupMyPhone");
             $('#setMyIp').click(function(){
@@ -283,11 +284,8 @@ var app = {
             var url = "http://poolmeup.appspot.com/rest/offers";
             var idOffer = null;
             $.post(url, JSON.stringify(req), function(data) {
-                idOffer = data.idOffer || 1;
-                var s = self.parseXML(data.pathResponse);
-                $.mobile.changePage("#viewpath");
-                $("#actionlist").append(s).listview("refresh");
-
+                idOffer = data.idOffer;
+                self.parseXML(data.pathLink);
                 self.timeoutID = setInterval(function() { self.longPolling(idOffer); }, 1000*30);
             });
         });
@@ -298,22 +296,21 @@ var app = {
             // FIXME DEBUG
             var drivers = [{
                 name: 'Minni',
-                phoneNumber:"3397323027",
-                vehicleType:"car",
+                phoneNumber:"+393663911237",
+                vehicleType:"CAR",
                 waitingTime:"35"
             },{
                 name:"Mariella",
-                phoneNumber:"+393337701783",
-                vehicleType:"autobus",
-                waitingTime:"155"
-            },{
-                name:"Mariella",
                 phoneNumber:"+393394745492",
-                vehicleType:"autobus",
+                vehicleType:"SCOOTER",
                 waitingTime:"155"
             }];
 
-            savedCO2 = 500;
+            savedCO2 = 2.02;
+
+//            self.showDriverList(drivers);
+//            return;
+
 
             var req = {
                     friends: self.getMyFriends(),
@@ -332,9 +329,16 @@ var app = {
             if (self.getCoords("#find-destinazione", req) === false) return;
             console.log(req);
 
+            currentFindRequest = JSON.stringify(req);
+
             var url = "http://poolmeup.appspot.com/rest/rides";
             $.post(url, JSON.stringify(req), function(data) {
-                self.showDriverList(data.offers);
+                if(data && data.offers > 0){
+                    self.showDriverList(data.offers);
+                }
+                else {
+                    navigator.notification.alert("Sorry, but no one of your friends could give you a ride.", function(){});
+                }
             });
 
         });
@@ -360,7 +364,7 @@ var app = {
             $(id).val(data.formatted_address);
             obj.name = data.formatted_address;
             obj.lat = data.geometry.location.lat;
-            obj.long = data.geometry.location.lng;
+            obj.lng = data.geometry.location.lng;
             req.pathRequest.push(obj);
         }, dataType: "json", async: false});
         return obj;
@@ -383,8 +387,13 @@ var app = {
     },
     parseXML: function(url) {
         var self = this;
-        var s = "";
+
+        // FIXME
+//        url = 'http://roma.dsps.sistemaits.com/dsps/roma/?treq=findPath&voft=20&vofd=0&lspe=0&mspe=80&lnwt=0&tort=0&rtrn=0&ltrn=0&muhs=0&mdhs=0&uslo=0&dslo=0&chup=0&chdw=0.05&lev1=0&lev2=0&lev3=0&lev4=0&lev5=0&CO=0&HC=0&NOx=0&PM=0&FC=0&CO2=0&tlzr=99999&tunn=0&brdg=0&urbn=0&npav=1&toll=0.1&cont=0&prio=0&pxco1=12.457123364642554&pyco1=41.90380837202841&addr1=Via+Sant%27Anna%2C+00120%2C+Vatican+City+%2812.45712%2C+41.90381%29&wait1=0&pxco2=12.581406200484775&pyco2=41.905341496702704&addr2=Via+Salviati%2C+8-16%2C+00155+Rome%2C+Italy+%2812.58141%2C+41.90534%29&wait2=0&mode=auto&tdes=0&tdat=2012-12-1+17%3A2%3A00&lang=ITA&_=1354377748873';
+        console.info(url);
         $.get(url, function(data) {
+            console.info("AAAAA success");
+            var s = "";
             $.each($("actn", data), function(i, el) {
                 var el = $(el);
                 var kind = el.attr("kind");
@@ -397,20 +406,19 @@ var app = {
                         "<h3>"+kind+"</h3><p>percorsi "+dist+"m, sono passati "+time+ " secondi</p></a></li>";
                 }
             });
-        });
-        return s;
+            $.mobile.changePage("#viewpath");
+            $("#actionlist").html(s).listview("refresh");
+        }, "xml");
     },
 
     longPolling: function(idOffer) {
         var self = this;
         var url = "http://poolmeup.appspot.com/rest/offers/";
         $.get(url+idOffer, function(data) {
-            if (data != null && data.pathResponse != null) {
+            if (data != null && data.pathLink != null) {
                 clearInterval(self.timeoutID);
                 self.showDialog("Richiesta trovata", "Il percorso sarà aggiornato!");
-                var s = self.parseXML(data.pathResponse);
-                $.mobile.changePage("#viewpath");
-                $("#actionlist").html(s).listview("refresh");
+                self.parseXML(data.pathLink);
             }
         });
     },
