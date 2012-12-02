@@ -41,7 +41,7 @@
     </head>
     <body>
 
-    <div data-role="page" id="index" style="background: #000000 url('img/risunki-yumor-7195.jpg') repeat;">
+    <div data-role="page" id="index" style="background: #414A59 url('img/risunki-yumor-7195.jpg') bottom left no-repeat fixed;">
 
         <div data-role="header">
             <h1>PoolMeUp!</h1>
@@ -68,15 +68,16 @@
         </div>
     </div>
 
-    <div data-role="popup" id="popupMyPhone" data-theme="a" class="ui-corner-all">
-        <form>
-            <div style="padding:10px 20px;">
-                <h3>Please insert your phone number</h3>
-                <label for="myphoneinput" class="ui-hidden-accessible">Phone (including prefix +39):</label>
-                <input type="tel" name="user" id="myphoneinput" value="" placeholder="username" data-theme="a" />
-                <button type="submit" data-theme="b" id="setMyIp">Sign in</button>
-            </div>
-        </form>
+    <div data-role="dialog" id="popupMyPhone">
+
+        <div data-role="header" data-theme="d">
+            <h1>Phone number</h1>
+        </div>
+        <div data-role="content" data-theme="c">
+            <p>Please insert your phone number (without +39)</p>
+            <input type="tel" name="user" id="myphoneinput" value="" placeholder="username" data-theme="a" />
+            <button type="submit" data-theme="b" id="setMyIp">Sign in</button>
+        </div>
     </div>
 
 

@@ -25,6 +25,8 @@ var app = {
         this.bindEvents();
         var self = this;
         $(document).ajaxError(function(event, request, settings, exception) {
+            console.warn("ERRORE AJAX");
+            console.warn(settings.url);
             self.showDialog("Network error", "Error connecting to "+settings.url);
         });
 
@@ -113,21 +115,15 @@ var app = {
 
             // Check for user phone number
         var myPhoneNumber =  window.localStorage.getItem("poolmeupmyphone");
-
+        myPhoneNumber = "";
         if(!myPhoneNumber || myPhoneNumber.length == 0) {
-            $( "#popupMyPhone" ).popup();
-            $( "#popupMyPhone" ).popup('open');
+            $.mobile.changePage("#popupMyPhone");
             $('#setMyIp').click(function(){
                 myPhoneNumber = $('#myphoneinput').val();
-                window.localStorage.setItem("poolmeupmyphone", myPhoneNumber);
-                $( "#popupMyPhone" ).popup();
+                //window.localStorage.setItem("poolmeupmyphone", myPhoneNumber);
+                $.mobile.changePage("#index");
             })
-            //myphoneinput
         }
-
-        console.info("########");
-
-
 
 //            console.log("in getMyPhoneNumber");
 //            var onSuccess = function(result) {
